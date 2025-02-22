@@ -142,14 +142,22 @@ def start_monitoring(directory, baseline):
 # Main function
 def main():
     """Main script execution."""
-    while True:  # Keep asking until user makes a valid choice
+    while True:  # Keep asking until user makes a valid choice or exits
         user_wants_new_baseline = get_user_choice()
+        
+        if user_wants_new_baseline is None:  # User closed the dialog
+            print("[INFO] User closed the prompt. Exiting...")
+            return
+        
         monitored_directory = select_directory()
-
-        if not monitored_directory:
-            messagebox.showerror("Error", "No directory selected. Please try again.")
-            continue  # Reprompt user
-
+        
+        if not monitored_directory:  
+            exit_choice = messagebox.askyesno("Exit", "No directory selected. Do you want to exit?")
+            if exit_choice:
+                print("[INFO] User chose to exit.")
+                return  # Exit the script
+            continue  # Reprompt user to select a directory
+        
         if user_wants_new_baseline:
             baseline = create_new_baseline(monitored_directory)
         else:
@@ -158,7 +166,7 @@ def main():
                 messagebox.showwarning("Warning", "No existing baseline found. Creating a new one...")
                 baseline = create_new_baseline(monitored_directory)
 
-        # Start monitoring after the user makes a valid choice
+        # Start monitoring after user makes a valid choice
         start_monitoring(monitored_directory, baseline)
         break  # Exit loop after monitoring starts
 
